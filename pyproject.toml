@@ -1,0 +1,16 @@
+[project]
+name = "multilingual-llm-eval"
+version = "0.1.0"
+description = "Educational multilingual LLM evaluation pipeline using FLORES-200 with comprehensive metrics and interactive visualizations"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "datasets>=2.14.0,<3.0.0",  # Pin to version that supports dataset scripts
+    "kaleido>=0.2.1",
+    "numpy>=2.3.5",
+    "plotly>=5.0.0",
+    "pydantic>=2.0.0",
+    "torch>=2.9.1",
+    "tqdm>=4.66.0",
+    "transformers>=4.57.3",
+]

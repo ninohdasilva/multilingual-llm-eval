@@ -1,0 +1,11 @@
+Run timestamp: 2025-12-03T00:43:49.205098
+Command executed: src/main.py --model Qwen/Qwen2.5-1.5B --langs fra,fin,zho_Hans --mode quick
+Models evaluated: Qwen/Qwen2.5-1.5B, unigram-char, char-5gram, gpt2
+Languages evaluated: fra, fin, zho_Hans
+Number of sentences per language: 50
+Location of outputs: /Users/ninoh/Developer/interviews/mlia/multilingual-llm-eval/outputs
+Duration (wall clock): 74.16 seconds
+Git commit: N/A
+
+Deviations from spec:
+- None

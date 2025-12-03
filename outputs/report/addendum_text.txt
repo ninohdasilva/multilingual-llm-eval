@@ -1,0 +1,7 @@
+Ranking Interpretation - Key Points for Interview:
+
+1. The aggregate ranking averages four metrics (PPL, BPC, Entropy, Gzip). While useful for overview, it can mask important typological differences between languages.
+
+2. Morphologically complex languages (e.g., Finnish, Turkish) often show higher tokens-per-character ratios, which can inflate token-based metrics like perplexity even when the model has comparable understanding.
+
+3. Always examine individual metrics and confidence intervals before drawing conclusions. A language ranking poorly on aggregate may excel on specific tokenizer-agnostic metrics like BPC.

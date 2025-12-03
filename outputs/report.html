@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual LLM Evaluation Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        .metric-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 3px solid #3498db;
+            margin: 15px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .family-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .family-Fusional { background: #3498db; color: white; }
+        .family-Agglutinative { background: #e67e22; color: white; }
+        .family-Isolating { background: #27ae60; color: white; }
+        .plot-container {
+            margin: 30px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .small-note {
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multilingual LLM Evaluation Report</h1>
+    </div>
+
+    <div class="container">
+        <h2>Objective</h2>
+        <p>
+            The objective of this experiment is to evaluate a multilingual language model across
+            several typologically diverse languages using a shared parallel corpus (FLORES-200).
+            We compare classical token-level performance (perplexity) with tokenizer-neutral
+            information-theoretic metrics (bits-per-character, entropy, gzip compression) and
+            tokenizer efficiency (tokens per character).
+        </p>
+        <p>
+            The global approach is:
+        </p>
+        <ul>
+            <li>Use FLORES-200 dev split (50 sentences per language for this run) as a controlled benchmark.</li>
+            <li>Compute all metrics on the same sentences for each language.</li>
+            <li>Normalize where necessary to allow fair cross-language comparison.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>Methodology</h2>
+        <ul>
+            <li><strong>Model:</strong> HuggingFaceTB/SmolLM3-3B evaluated as a causal language model.</li>
+            <li><strong>Languages evaluated:</strong> 3 languages across 3 morphological families (Fusional, Agglutinative, Isolating).</li>
+            <li><strong>Dataset:</strong> FLORES-200 dev split, 50 parallel sentences per language for this run.</li>
+            <li><strong>Evaluation date:</strong> 2025-12-02 23:15:10</li>
+            <li><strong>Evaluation mode:</strong> raw sentences (no chat template), truncated at 512 tokens.</li>
+            <li><strong>Perplexity:</strong> computed from the model's cross-entropy loss with <code>labels = input_ids</code>.</li>
+            <li><strong>BPC:</strong> derived from perplexity and total tokens/characters, providing a tokenizer-neutral view.</li>
+            <li><strong>Gzip ratio:</strong> computed on UTF-8 text compressed with gzip at a fixed level.</li>
+            <li><strong>Entropy:</strong> averaged over the model's softmax distributions for next-token prediction.</li>
+            <li><strong>Tokens/char:</strong> computed from the tokenizer's encoding without special tokens.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>Metrics Overview</h2>
+        <div class="metric-box">
+            <h3>Metric definitions and directions</h3>
+            <ul>
+                <li><strong>Perplexity</strong> (token-level): average <code>exp(loss)</code> per token.
+                    <br><span class="small-note">Lower is better  -  fewer equally likely options per token.</span>
+                </li>
+                <li><strong>Bits-per-character (BPC)</strong>: bits needed, on average, to encode each character.
+                    <br><span class="small-note">Lower is better  -  more compressible, tokenizer-neutral comparison.</span>
+                </li>
+                <li><strong>Gzip ratio</strong>: <code>compressed_size / original_size</code> using gzip.
+                    <br><span class="small-note">Lower is better  -  more redundancy and regularity in the text.</span>
+                </li>
+                <li><strong>Entropy</strong>: average uncertainty of the model's predicted distribution per token.
+                    <br><span class="small-note">Lower is better  -  more confident predictions.</span>
+                </li>
+                <li><strong>Tokens per character</strong>: average number of tokens needed per raw character.
+                    <br><span class="small-note">Lower is better  -  a more efficient, less biased tokenizer.
+                    We use tokens/char instead of chars/token because it tracks the actual cost in
+                    tokens directly.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Summary Statistics by Language</h2>
+        <p class="small-note">
+            All metrics are computed on the same FLORES-200 dev sentences for each language.
+            For every metric in the table below, <strong>lower is better</strong>.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Language</th>
+                    <th>Family</th>
+                    <th>Perplexity</th>
+                    <th>BPC</th>
+                    <th>Gzip ratio</th>
+                    <th>Entropy (bits)</th>
+                    <th>Tokens/char</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td><strong>Finnish</strong><br><code>fin</code></td>
+                    <td><span class="family-badge family-Agglutinative">Agglutinative</span></td>
+                    <td>88.59</td>
+                    <td>1.690834</td>
+                    <td>0.9205</td>
+                    <td>4.6191</td>
+                    <td>0.3771</td>
+                </tr>
+
+                <tr>
+                    <td><strong>French</strong><br><code>fra</code></td>
+                    <td><span class="family-badge family-Fusional">Fusional</span></td>
+                    <td>15.36</td>
+                    <td>0.772993</td>
+                    <td>0.9013</td>
+                    <td>2.7161</td>
+                    <td>0.2829</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Mandarin (Simplified)</strong><br><code>zho_Hans</code></td>
+                    <td><span class="family-badge family-Isolating">Isolating</span></td>
+                    <td>30.51</td>
+                    <td>2.749942</td>
+                    <td>1.1162</td>
+                    <td>3.6605</td>
+                    <td>0.8046</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container">
+        <h2>Visualizations</h2>
+
+        <div class="plot-container">
+            <h3>Bits-per-character by language</h3>
+            <p class="small-note">
+                Lower BPC indicates better modeling efficiency at the character level and is
+                independent of tokenizer segmentation.
+            </p>
+            <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.3.0.min.js" integrity="sha256-bO3dS6yCpk9aK4gUpNELtCiDeSYvGYnK7jFI58NQnHI=" crossorigin="anonymous"></script>                <div id="db402295-c09b-48cd-963d-ca42bf9f89bc" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("db402295-c09b-48cd-963d-ca42bf9f89bc")) {                    Plotly.newPlot(                        "db402295-c09b-48cd-963d-ca42bf9f89bc",                        [{"customdata":["Agglutinative","Fusional","Isolating"],"hovertemplate":"\u003cb\u003e%{x}\u003c\u002fb\u003e\u003cbr\u003eBPC: %{y:.6f}\u003cbr\u003eFamily: %{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":["#ff7f0e","#1f77b4","#2ca02c"]},"text":["1.690834","0.772993","2.749942"],"textposition":"outside","x":["Finnish\n(fin)","French\n(fra)","Mandarin (Simplified)\n(zho_Hans)"],"y":[1.6908338143397406,0.7729926316193009,2.7499424635658007],"type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"title":{"text":"Bits-Per-Character (BPC) by Language"},"xaxis":{"title":{"text":"Language"}},"yaxis":{"title":{"text":"Bits-Per-Character"}},"hovermode":"closest","height":500},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Tokenizer bias: tokens per character</h3>
+            <p class="small-note">
+                Higher tokens/char means the tokenizer needs more pieces to represent the same
+                raw text, which can make token-based metrics look worse for that language.
+            </p>
+            <div>                            <div id="cd35d4cd-b526-4f2d-a737-015d5500238c" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("cd35d4cd-b526-4f2d-a737-015d5500238c")) {                    Plotly.newPlot(                        "cd35d4cd-b526-4f2d-a737-015d5500238c",                        [{"customdata":["Agglutinative","Fusional","Isolating"],"hovertemplate":"\u003cb\u003e%{x}\u003c\u002fb\u003e\u003cbr\u003eTokens\u002fChar: %{y:.4f}\u003cbr\u003eFamily: %{customdata}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":["#ff7f0e","#1f77b4","#2ca02c"]},"text":["0.3771","0.2829","0.8046"],"textposition":"outside","x":["Finnish\n(fin)","French\n(fra)","Mandarin (Simplified)\n(zho_Hans)"],"y":[0.37708001736362323,0.2829385147724248,0.8045685279187818],"type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"title":{"text":"Tokenizer Bias: Tokens per Character Ratio"},"xaxis":{"title":{"text":"Language"}},"yaxis":{"title":{"text":"Tokens per Character"}},"hovermode":"closest","height":500},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Perplexity vs. bits-per-character</h3>
+            <p class="small-note">
+                This scatter plot shows how token-level perplexity and character-level BPC 
+                relate. Deviations highlight cases where tokenizer behavior strongly affects
+                perplexity.
+            </p>
+            <div>                            <div id="81083a3c-1174-498b-99c4-9cba47b94aed" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("81083a3c-1174-498b-99c4-9cba47b94aed")) {                    Plotly.newPlot(                        "81083a3c-1174-498b-99c4-9cba47b94aed",                        [{"hovertemplate":"\u003cb\u003e%{text}\u003c\u002fb\u003e\u003cbr\u003ePerplexity: %{x:.2f}\u003cbr\u003eBPC: %{y:.6f}\u003cbr\u003eFamily: Fusional\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#1f77b4","size":12},"mode":"markers+text","name":"Fusional","text":["French"],"textposition":"top center","x":[15.363834381103516],"y":[0.7729926316193009],"type":"scatter"},{"hovertemplate":"\u003cb\u003e%{text}\u003c\u002fb\u003e\u003cbr\u003ePerplexity: %{x:.2f}\u003cbr\u003eBPC: %{y:.6f}\u003cbr\u003eFamily: Agglutinative\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#ff7f0e","size":12},"mode":"markers+text","name":"Agglutinative","text":["Finnish"],"textposition":"top center","x":[88.58998107910156],"y":[1.6908338143397406],"type":"scatter"},{"hovertemplate":"\u003cb\u003e%{text}\u003c\u002fb\u003e\u003cbr\u003ePerplexity: %{x:.2f}\u003cbr\u003eBPC: %{y:.6f}\u003cbr\u003eFamily: Isolating\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#2ca02c","size":12},"mode":"markers+text","name":"Isolating","text":["Mandarin"],"textposition":"top center","x":[30.50558090209961],"y":[2.7499424635658007],"type":"scatter"},{"line":{"color":"gray","dash":"dash"},"mode":"lines","name":"Trend","showlegend":false,"x":{"dtype":"f8","bdata":"AAAAgEi6LkBYCtR6fhowQLAUqLXY1zBACB988DKVMUBgKVArjVIyQLgzJGbnDzNAED74oEHNM0BnSMzbm4o0QL9SoBb2RzVAF110UVAFNkBvZ0iMqsI2QMdxHMcEgDdAH3zwAV89OEB3hsQ8ufo4QM6QmHcTuDlAJptssm11OkB+pUDtxzI7QNavFCgi8DtALrroYnytPECGxLyd1mo9QN7OkNgwKD5ANtlkE4vlPkCO4zhO5aI\u002fQPN2hsQfMEBAH3zw4cyOQEBLgVr\u002fee1AQHeGxBwnTEFAoosuOtSqQUDOkJhXgQlCQPqVAnUuaEJAJptsktvGQkBSoNaviCVDQH6lQM01hENAqqqq6uLiQ0DWrxQIkEFEQAK1fiU9oERALrroQur+REBav1Jgl11FQIbEvH1EvEVAsskmm\u002fEaRkDezpC4nnlGQArU+tVL2EZANtlk8\u002fg2R0Bi3s4QppVHQI7jOC5T9EdAuuiiSwBTSEDm7QxprbFIQBLzdoZaEElAPvjgowdvSUBq\u002fUrBtM1JQJYCtd5hLEpAwgcf\u002fA6LSkDuDIkZvOlKQBoS8zZpSEtARRddVBanS0BxHMdxwwVMQJ0hMY9wZExAySabrB3DTED1KwXKyiFNQCExb+d3gE1ATTbZBCXfTUB5O0Mi0j1OQKVArT9\u002fnE5A0UUXXSz7TkD9SoF62VlPQClQ65eGuE9Aqqqq2pkLUEBArV9p8DpQQNavFPhGalBAbLLJhp2ZUEACtX4V9MhQQJi3M6RK+FBALrroMqEnUUDEvJ3B91ZRQFq\u002fUlBOhlFA8MEH36S1UUCGxLxt++RRQBzHcfxRFFJAsskmi6hDUkBIzNsZ\u002f3JSQN7OkKhVolJAdNFFN6zRUkAK1PrFAgFTQKDWr1RZMFNANtlk469fU0DM2xlyBo9TQGLezgBdvlNA+OCDj7PtU0CO4zgeCh1UQCTm7axgTFRAuuiiO7d7VEBQ61fKDatUQObtDFlk2lRAfPDB57oJVUAS83Z2ETlVQKj1KwVoaFVAPvjgk76XVUDU+pUiFcdVQGr9SrFr9lVAAAAAQMIlVkA="},"y":{"dtype":"f8","bdata":"o\u002fFwiBLv+T8SyEuoHPv5P4CeJsgmB\u002fo\u002f73QB6DAT+j9eS9wHOx\u002f6P80htydFK\u002fo\u002fPPiRR083+j+qzmxnWUP6PxmlR4djT\u002fo\u002fiHsip21b+j\u002f3Uf3Gd2f6P2Yo2OaBc\u002fo\u002f1f6yBox\u002f+j9D1Y0mlov6P7KraEagl\u002fo\u002fIYJDZqqj+j+QWB6GtK\u002f6P\u002f8u+aW+u\u002fo\u002fbQXUxcjH+j\u002fc267l0tP6P0uyiQXd3\u002fo\u002fuohkJefr+j8pXz9F8ff6P5g1GmX7A\u002fs\u002fBgz1hAUQ+z914s+kDxz7P+S4qsQZKPs\u002fU4+F5CM0+z\u002fCZWAELkD7PzA8OyQ4TPs\u002fnxIWREJY+z8O6fBjTGT7P32\u002fy4NWcPs\u002f7JWmo2B8+z9abIHDaoj7P8lCXON0lPs\u002fOBk3A3+g+z+n7xEjiaz7PxbG7EKTuPs\u002fhZzHYp3E+z\u002f0cqKCp9D7P2JJfaKx3Ps\u002f0R9Ywrvo+z9A9jLixfT7P6\u002fMDQLQAPw\u002fHqPoIdoM\u002fD+MecNB5Bj8P\u002ftPnmHuJPw\u002faiZ5gfgw\u002fD\u002fZ\u002fFOhAj38P0jTLsEMSfw\u002ftqkJ4RZV\u002fD8lgOQAIWH8P5RWvyArbfw\u002fAy2aQDV5\u002fD9yA3VgP4X8P+DZT4BJkfw\u002fT7AqoFOd\u002fD++hgXAXan8Py1d4N9ntfw\u002fnDO7\u002f3HB\u002fD8LCpYffM38P3rgcD+G2fw\u002f6LZLX5Dl\u002fD9XjSZ\u002fmvH8P8ZjAZ+k\u002ffw\u002fNTrcvq4J\u002fT+kELfeuBX9PxLnkf7CIf0\u002fgb1sHs0t\u002fT\u002fwk0c+1zn9P19qIl7hRf0\u002fzkD9fetR\u002fT88F9id9V39P6vtsr3\u002faf0\u002fGsSN3Ql2\u002fT+Jmmj9E4L9P\u002fhwQx0ejv0\u002fZkcePSia\u002fT\u002fVHflcMqb9P0T003w8sv0\u002fs8qunEa+\u002fT8ioYm8UMr9P5F3ZNxa1v0\u002fAE4\u002f\u002fGTi\u002fT9uJBocb+79P9369Dt5+v0\u002fTNHPW4MG\u002fj+7p6p7jRL+Pyp+hZuXHv4\u002fmFRgu6Eq\u002fj8HKzvbqzb+P3YBFvu1Qv4\u002f5dfwGsBO\u002fj9Urss6ylr+P8KEplrUZv4\u002fMVuBet5y\u002fj+gMVya6H7+Pw8IN7ryiv4\u002fft4R2vyW\u002fj8="},"type":"scatter"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"title":{"text":"Perplexity vs Bits-Per-Character"},"xaxis":{"title":{"text":"Perplexity"}},"yaxis":{"title":{"text":"Bits-Per-Character (BPC)"}},"hovermode":"closest","height":500},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Normalized metrics heatmap</h3>
+            <p class="small-note">
+                Metrics are normalized per column to [0, 1] for visual comparison. Darker
+                cells indicate relatively higher values (worse for all metrics in this
+                report).
+            </p>
+            <div>                            <div id="d23144fc-7e77-48c1-bfcf-c1f0d99abd9e" class="plotly-graph-div" style="height:400px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("d23144fc-7e77-48c1-bfcf-c1f0d99abd9e")) {                    Plotly.newPlot(                        "d23144fc-7e77-48c1-bfcf-c1f0d99abd9e",                        [{"colorscale":[[0.0,"#440154"],[0.1111111111111111,"#482878"],[0.2222222222222222,"#3e4989"],[0.3333333333333333,"#31688e"],[0.4444444444444444,"#26828e"],[0.5555555555555556,"#1f9e89"],[0.6666666666666666,"#35b779"],[0.7777777777777778,"#6ece58"],[0.8888888888888888,"#b5de2b"],[1.0,"#fde725"]],"hovertemplate":"\u003cb\u003e%{y}\u003c\u002fb\u003e\u003cbr\u003eLanguage: %{x}\u003cbr\u003eNormalized: %{z:.3f}\u003cbr\u003eRaw: %{text}\u003cextra\u003e\u003c\u002fextra\u003e","text":[["88.5900","15.3638","30.5056"],["1.6908","0.7730","2.7499"],["0.9205","0.9013","1.1162"],["4.6191","2.7161","3.6605"],["0.3771","0.2829","0.8046"]],"textfont":{"size":10},"texttemplate":"%{text}","x":["Finnish\n(fin)","French\n(fra)","Mandarin (Simplified)\n(zho_Hans)"],"y":["Perplexity","BPC","Gzip Ratio","Entropy","Tokens\u002fChar"],"z":[[1.0,0.0,0.20678059960527814],[0.4642713577697293,0.0,1.0],[0.08928386048507492,0.0,1.0],[1.0,0.0,0.49625733299040653],[0.1804756249038618,0.0,1.0]],"type":"heatmap"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"title":{"text":"Normalized Metrics Heatmap"},"xaxis":{"title":{"text":"Language"}},"yaxis":{"title":{"text":"Metric"}},"height":400},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Loss distribution by language</h3>
+            <p class="small-note">
+                This boxplot shows the distribution of per-sentence losses for each language.
+                Wider boxes indicate higher variance, revealing languages with more inconsistent
+                model performance across sentences.
+            </p>
+            <div>                            <div id="7ea7ddb3-8c2a-4760-9d3b-027e9dbc71fb" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("7ea7ddb3-8c2a-4760-9d3b-027e9dbc71fb")) {                    Plotly.newPlot(                        "7ea7ddb3-8c2a-4760-9d3b-027e9dbc71fb",                        [{"boxmean":"sd","marker":{"color":"#ff7f0e"},"name":"Finnish","y":[3.829540729522705,4.102278232574463,3.616472005844116,7.611839294433594,5.646117210388184,5.093405723571777,5.186758518218994,4.514564514160156,4.388893127441406,3.8960654735565186,4.513523101806641,5.6792473793029785,6.630327224731445,4.981666564941406,3.6629459857940674,4.021920204162598,3.9298861026763916,4.27578592300415,4.307358264923096,4.394444465637207,5.740329742431641,6.251725673675537,4.153492450714111,5.425093173980713,5.105731010437012,5.442367076873779,3.723670721054077,4.100122928619385,3.830786943435669,5.987721920013428,4.422335147857666,4.941893577575684,5.09559440612793,5.627766132354736,4.241705894470215,5.708008289337158,4.1786980628967285,4.754117012023926,3.777597665786743,3.5103976726531982,5.502431869506836,3.7993571758270264,4.352199554443359,4.205650806427002,4.0637664794921875,5.0262627601623535,2.905036449432373,4.784298419952393,6.324106216430664,4.66900634765625],"type":"box"},{"boxmean":"sd","marker":{"color":"#1f77b4"},"name":"French","y":[2.0649068355560303,1.7584850788116455,2.7901875972747803,4.068972587585449,2.396618366241455,2.4004383087158203,3.062408685684204,2.294811725616455,2.3421037197113037,1.798986554145813,2.8773128986358643,3.0019164085388184,3.540161609649658,3.759352445602417,2.9850850105285645,2.033987045288086,2.5586719512939453,3.266366481781006,2.479342222213745,2.436884880065918,3.6664979457855225,4.370041370391846,3.531944990158081,4.688186168670654,2.5354535579681396,3.728288412094116,1.7054617404937744,2.2252893447875977,2.552480697631836,2.8319482803344727,2.566537618637085,2.4983065128326416,2.81899094581604,3.2906360626220703,2.7716174125671387,3.4009106159210205,3.398092269897461,3.4522552490234375,2.898158550262451,3.3865208625793457,3.537407398223877,2.5766377449035645,2.5957815647125244,3.2306764125823975,2.2157657146453857,2.3653409481048584,2.163862466812134,2.997109889984131,3.520395517349243,2.6540400981903076],"type":"box"},{"boxmean":"sd","marker":{"color":"#2ca02c"},"name":"Mandarin (Simplified)","y":[2.6007637977600098,2.7815515995025635,3.286144733428955,4.628857135772705,4.627689361572266,3.4147651195526123,3.3162729740142822,3.0781850814819336,5.021244049072266,3.2189106941223145,3.7001073360443115,3.814479112625122,4.476916790008545,3.8735954761505127,3.1625359058380127,2.4827768802642822,3.643615245819092,3.4958248138427734,3.2664475440979004,3.518735885620117,3.940699815750122,5.603464603424072,3.8245151042938232,4.280865669250488,2.4678218364715576,3.4429147243499756,2.3180058002471924,3.174299716949463,3.121208667755127,3.2347617149353027,4.176768779754639,2.6475515365600586,3.960165500640869,3.935319423675537,3.5903778076171875,5.997101783752441,3.9511566162109375,3.227324962615967,3.7613489627838135,4.152134895324707,3.434044599533081,3.344071626663208,3.369643449783325,3.186580181121826,3.354529619216919,2.9226419925689697,3.614591121673584,3.4543964862823486,4.34689998626709,3.206174850463867],"type":"box"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"title":{"text":"Loss Distribution by Language"},"xaxis":{"title":{"text":"Language"}},"yaxis":{"title":{"text":"Loss"}},"height":500,"showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Top-50 token frequencies by language</h3>
+            <p class="small-note">
+                This histogram shows the most frequent tokens for each language, revealing
+                tokenizer segmentation patterns and "pressure points" where the tokenizer
+                frequently segments text.
+            </p>
+            <div>                            <div id="946a9c69-8b68-4947-be0d-02c6e486cb1c" class="plotly-graph-div" style="height:300px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("946a9c69-8b68-4947-be0d-02c6e486cb1c")) {                    Plotly.newPlot(                        "946a9c69-8b68-4947-be0d-02c6e486cb1c",                        [{"marker":{"color":"#ff7f0e"},"name":"Finnish","showlegend":false,"x":["2357","13","11","258","220","276","268","72","12203","1609","597","379","74","266","503","73","64","15492","689","259","33614","389","3029","296","84","285","281","71","301","441","1468","2852","4657","264","30902","274","747","344","7643","61227","2857","5418","912","73451","564","616","454","359","332","427"],"y":[76,59,47,46,39,34,34,27,24,22,21,18,18,17,17,17,16,16,16,13,13,13,12,12,12,11,11,11,11,11,10,10,10,10,10,10,9,9,9,9,9,9,9,9,9,9,8,8,8,8],"type":"bar","xaxis":"x","yaxis":"y"},{"marker":{"color":"#1f77b4"},"name":"French","showlegend":false,"x":["409","11","13","1208","220","978","264","514","3869","326","1880","294","665","3930","951","3625","519","4194","653","1744","1826","5019","8047","5636","14848","6316","1765","24560","529","6","7591","4046","7010","8065","320","274","2356","68","8921","1370","31109","84","648","8","348","2489","5553","16","265","17771"],"y":[82,59,54,39,39,38,38,32,29,24,24,20,18,18,18,17,17,16,15,14,11,10,10,10,9,9,9,9,9,8,8,8,8,7,7,6,6,6,6,6,5,5,5,5,5,5,5,5,5,5],"type":"bar","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"#2ca02c"},"name":"Mandarin (Simplified)","showlegend":false,"x":["1811","3922","220","9554","19000","35287","70349","14260","103601","16325","41053","100179","27384","105124","34208","23039","10110","101597","101377","17905","320","21043","79059","97522","42399","61786","101011","17039","40265","83266","8","105343","94588","108324","35304","66378","2118","102283","95337","56602","58666","30590","13646","21601","17792","70141","73325","105665","30832","33748"],"y":[48,39,38,37,22,15,12,12,12,11,11,11,11,10,9,9,9,9,9,8,8,8,8,8,8,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,6,6,6,6,6,6,6,6,5],"type":"bar","xaxis":"x3","yaxis":"y3"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.26666666666666666],"title":{"text":"Token ID"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Frequency"}},"xaxis2":{"anchor":"y2","domain":[0.3666666666666667,0.6333333333333333],"title":{"text":"Token ID"}},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"title":{"text":"Frequency"}},"xaxis3":{"anchor":"y3","domain":[0.7333333333333334,1.0],"title":{"text":"Token ID"}},"yaxis3":{"anchor":"x3","domain":[0.0,1.0],"title":{"text":"Frequency"}},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Finnish","x":0.13333333333333333,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"French","x":0.5,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Mandarin (Simplified)","x":0.8666666666666667,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"}],"title":{"text":"Top-50 Token Frequencies by Language"},"height":300},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Per-Language Segmentation Analysis</h2>
+        <p class="small-note">
+            Example sentences showing how the tokenizer segments text for each language.
+            This reveals tokenization efficiency and morphological complexity.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Language</th>
+                    <th>Original Sentence</th>
+                    <th>Tokenization</th>
+                    <th>Num Tokens</th>
+                    <th>Tokens/Char</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td><strong>Finnish</strong></td>
+                    <td>Stanfordin yliopiston lääketieteen laitoksen tutkijat ilmoittivat maanantaina uu...</td>
+                    <td class="small-note">Stan, f, ordin, Ġy, li, op, iston, ĠlÃ¤, Ã¤, ket ... (+102 more)</td>
+                    <td>112</td>
+                    <td>0.3696</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Finnish</strong></td>
+                    <td>Johtavat tutkijat sanovat, että sen avulla syöpä, tuberkuloosi, HIV ja malaria v...</td>
+                    <td class="small-note">Jo, ht, av, at, Ġtut, k, ij, at, Ġsan, ovat ... (+90 more)</td>
+                    <td>100</td>
+                    <td>0.3559</td>
+                </tr>
+
+                <tr>
+                    <td><strong>French</strong></td>
+                    <td>Des scientifiques de l’école de médecine de l’université de Stanford ont annoncé...</td>
+                    <td class="small-note">Des, Ġscient, if, iques, Ġde, Ġl, âĢĻÃ©, cole, Ġde, ĠmÃ© ... (+87 more)</td>
+                    <td>97</td>
+                    <td>0.2658</td>
+                </tr>
+
+                <tr>
+                    <td><strong>French</strong></td>
+                    <td>Selon les chercheurs principaux, cela pourrait permettre une détection précoce d...</td>
+                    <td class="small-note">Sel, on, Ġles, Ġcherche, urs, Ġprincip, aux, ,, Ġcela, Ġpourrait ... (+68 more)</td>
+                    <td>78</td>
+                    <td>0.2617</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Mandarin (Simplified)</strong></td>
+                    <td>周一，斯坦福大学医学院的科学家宣布，他们发明了一种可以将细胞按类型分类的新型诊断工具：一种可打印的微型芯片。这种芯片可以使用标准喷墨打印机制造，每片价格可能在一...</td>
+                    <td class="small-note">åĳ¨, ä¸Ģ, ï¼Į, æĸ¯, åĿ¦, ç¦ı, å¤§åŃ¦, åĮ», åŃ¦éĻ¢, çļĦ ... (+55 more)</td>
+                    <td>65</td>
+                    <td>0.7647</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Mandarin (Simplified)</strong></td>
+                    <td>主要研究人员表示，这可以让低收入国家/地区的患者尽早发现癌症、肺结核、艾滋病和疟疾。在这些国家/地区，乳腺癌等疾病的生存率可能仅为富裕国家的一半。</td>
+                    <td class="small-note">ä¸»è¦ģ, çłĶç©¶, äººåĳĺ, è¡¨ç¤º, ï¼Įè¿Ļ, åı¯ä»¥, è®©, ä½İ, æĶ¶åħ¥, åĽ½å®¶ ... (+51 more)</td>
+                    <td>61</td>
+                    <td>0.8356</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container">
+        <h2>Interpretation by Typological Family</h2>
+
+        <h3>Agglutinative Languages</h3>
+        <p>Agglutinative languages (e.g., Turkish, Finnish, Swahili) build words by concatenating 
+        morphemes. A single word can express complex meanings through a chain of suffixes. This leads to 
+        long BPE segmentations, increasing tokens/char and artificially inflating perplexity. The tokenizer 
+        often breaks these long words into many subword units, making token-based metrics appear worse even 
+        if the model's underlying understanding is good.</p>
+
+        <h3>Fusional Languages</h3>
+        <p>Fusional languages (e.g., French, Hindi, Norwegian Nynorsk) use inflection to express 
+        grammatical relationships. Words change form (e.g., verb conjugations) to indicate tense, person, 
+        number, and gender. This morphological ambiguity can penalize perplexity because the model must 
+        learn complex inflectional paradigms. Tokenizers may struggle with highly inflected forms if they 
+        are rare, potentially leading to more subword tokens.</p>
+
+        <h3>Isolating Languages</h3>
+        <p>Isolating languages (e.g., Mandarin Simplified) have minimal morphology. Most words 
+        are monomorphemic, and grammatical relationships are expressed through word order and particles. 
+        This leads to tokens roughly tracking characters, resulting in more stable perplexity values. 
+        However, BPC may be higher due to the character-level information density of logographic or 
+        ideographic writing systems.</p>
+
+    </div>
+
+    <div class="container">
+        <h2>Metric Rankings</h2>
+        <p class="small-note">
+            Rankings show relative performance across languages for each metric (1 = best, lower is better for all metrics).
+            Comparing rankings reveals how tokenizer-dependent metrics (PPL) differ from tokenizer-agnostic ones (BPC, entropy, gzip).
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Language</th>
+                    <th>Rank PPL</th>
+                    <th>Rank BPC</th>
+                    <th>Rank Entropy</th>
+                    <th>Rank Gzip</th>
+                </tr>
+            </thead>
+            <tbody>
+{rankings_rows}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container">
+        <h2>Comparative Conclusion</h2>
+        <p>{conclusion}</p>
+    </div>
+
+    <div class="container">
+        <h2>Educational Content</h2>
+        
+        <h3>Language Families and Morphology</h3>
+        <p>
+            Languages exhibit diverse morphological structures that significantly impact how they are
+            processed by tokenizers and language models. Understanding these differences is key to
+            interpreting multilingual evaluation results.
+        </p>
+        
+        <h4>Fusional Languages (e.g., French, Hindi, Norwegian Nynorsk)</h4>
+        <p>
+            Fusional languages use <strong>inflection</strong> to express grammatical relationships.
+            Words change form (e.g., verb conjugations) to indicate tense, person, number, and gender.
+            Multiple grammatical features are fused into single morphemes.
+        </p>
+        <p><strong>Example (French):</strong> "parler" (to speak) → "parlons" (we speak) - the ending "-ons" encodes person, number, and tense.</p>
+
+        <h4>Agglutinative Languages (e.g., Turkish, Finnish, Swahili)</h4>
+        <p>
+            Agglutinative languages build words by <strong>concatenating morphemes</strong>.
+            A single word can express complex meanings through a chain of suffixes. Each morpheme
+            typically has a single grammatical function.
+        </p>
+        <p><strong>Example (Turkish):</strong> "ev" (house) → "evlerimizde" (in our houses) - each suffix adds meaning: -ler (plural), -imiz (our), -de (in).</p>
+
+        <h4>Isolating Languages (e.g., Mandarin Simplified)</h4>
+        <p>
+            Isolating languages have <strong>minimal morphology</strong>. Most words are monomorphemic,
+            and grammatical relationships are expressed through word order and particles rather than
+            inflection or agglutination.
+        </p>
+        <p><strong>Example (Mandarin):</strong> "我 吃 饭" (I eat rice) - each word is separate, word order indicates subject-verb-object.</p>
+
+        <h3>Why This Matters for LLMs</h3>
+        <ul>
+            <li><strong>Tokenization challenges:</strong> Agglutinative languages often produce more tokens per word because words can become very long through suffixation.</li>
+            <li><strong>Vocabulary coverage:</strong> Morphologically-rich languages have many word forms, challenging subword tokenizers that may not have seen all morphological variants.</li>
+            <li><strong>Cross-lingual fairness:</strong> Token-based metrics (like perplexity) can unfairly penalize morphologically-rich languages, making character-based metrics (BPC) essential for fair comparison.</li>
+            <li><strong>Tokenizer bias:</strong> The tokens-per-character ratio reveals how efficiently the tokenizer segments each language, with higher ratios indicating more tokenization overhead.</li>
+        </ul>
+
+        <h3>Understanding the Metrics</h3>
+        <p>
+            <strong>Perplexity</strong> measures how "surprised" a language model is by the text.
+            Mathematically, it's the exponential of the cross-entropy loss. Lower perplexity means
+            the model is better at predicting the next token. However, perplexity is token-based,
+            so it's affected by how the tokenizer segments text.
+        </p>
+        <p>
+            <strong>Bits-per-character (BPC)</strong> normalizes the model's predictive power by
+            characters instead of tokens, removing tokenizer bias. This is crucial for comparing
+            morphologically-rich languages (Turkish, Finnish) with isolating languages (Mandarin)
+            where tokenization differs significantly.
+        </p>
+        <p>
+            <strong>Gzip compression ratio</strong> provides a model-independent measure of text
+            redundancy. Languages with more predictable patterns compress better (lower ratio),
+            while high information density leads to less compression (higher ratio).
+        </p>
+        <p>
+            <strong>Entropy</strong> quantifies the average uncertainty in the model's probability
+            distribution. High entropy means the model is uncertain (flat distribution), while low
+            entropy indicates confidence (peaked distribution). Entropy is closely related to
+            perplexity but offers a direct measure of uncertainty in bits per token.
+        </p>
+        <p>
+            <strong>Tokens per character</strong> reveals tokenization efficiency. This metric
+            directly tracks the cost in tokens: if tokens/char doubles, you need twice as many
+            tokens for the same raw text. This makes it more interpretable than characters per token
+            for understanding tokenizer bias.
+        </p>
+    </div>
+
+    <div class="container">
+        <p class="small-note" style="text-align: center; margin-top: 40px;">
+            Generated by the Multilingual LLM Evaluation Pipeline - {timestamp_str}
+        </p>
+    </div>
+</body>
+</html>

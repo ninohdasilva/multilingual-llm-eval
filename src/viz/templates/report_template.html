@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual LLM Evaluation Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        h4 { color: #7f8c8d; margin-top: 15px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .family-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .family-Fusional { background: #3498db; color: white; }
+        .family-Agglutinative { background: #e67e22; color: white; }
+        .family-Isolating { background: #27ae60; color: white; }
+        .plot-container {
+            margin: 30px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .small-note {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .key-findings {
+            background: #e8f5e9;
+            padding: 20px;
+            border-left: 4px solid #4CAF50;
+            margin: 20px 0;
+        }
+        .key-findings ul {
+            margin: 10px 0;
+        }
+        .key-findings li {
+            margin: 8px 0;
+        }
+        .limitations { 
+            background-color: #fff3cd; 
+            padding: 15px; 
+            border-left: 4px solid #ffc107; 
+        }
+        .appendix {
+            background: #f9f9f9;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 2px solid #ddd;
+        }
+        .appendix h2 {
+            color: #666;
+        }
+        .ci-note {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multilingual LLM Evaluation Report</h1>
+        <p><strong>Model:</strong> {{MODEL_NAME}}</p>
+        <p><strong>Evaluation Date:</strong> {{RUN_DATE}}</p>
+        <p><strong>Mode:</strong> {{MODE}} ({{SENTENCE_COUNT}} sentences per language)</p>
+        <p><strong>Languages:</strong> {{LANGUAGES}}</p>
+    </div>
+
+    <div class="container key-findings">
+        <h2>Executive Summary: Key Findings</h2>
+        {{KEY_FINDINGS}}
+    </div>
+
+    <div class="container">
+        <h2>Objective</h2>
+        <p>
+            Evaluate a multilingual language model across typologically diverse languages using FLORES-200,
+            comparing token-based metrics (perplexity) with tokenizer-agnostic metrics (BPC, gzip) to assess
+            cross-lingual fairness and tokenizer bias.
+        </p>
+    </div>
+
+    <div class="container">
+        <h2>Methodology</h2>
+        <ul>
+            <li><strong>Model:</strong> {{MODEL_NAME}}</li>
+            <li><strong>Dataset:</strong> FLORES-200 dev split ({{SENTENCE_COUNT}} parallel sentences per language)</li>
+            <li><strong>Pipeline:</strong> Input text → tokenize → forward pass → compute loss → calculate metrics → aggregate → bootstrap CI → visualizations</li>
+            <li><strong>Baselines:</strong> char-unigram, char-5gram, GPT-2 (124M)</li>
+        </ul>
+        
+        <h3>Metrics Summary</h3>
+        <table style="font-size: 0.9em;">
+            <tr>
+                <th>Metric</th>
+                <th>Type</th>
+                <th>Tokenizer-Dependent</th>
+                <th>Model-Dependent</th>
+                <th>Direction</th>
+                <th>Notes</th>
+            </tr>
+            <tr>
+                <td><strong>Perplexity (PPL)</strong></td>
+                <td>Token-based</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Lower is better</td>
+                <td>exp(cross-entropy loss)</td>
+            </tr>
+            <tr>
+                <td><strong>Bits-per-Character (BPC)</strong></td>
+                <td>Character-based</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>Lower is better</td>
+                <td>Tokenizer-agnostic</td>
+            </tr>
+            <tr>
+                <td><strong>Gzip Ratio</strong></td>
+                <td>Text-only</td>
+                <td>No</td>
+                <td><strong>No</strong></td>
+                <td>Lower is better</td>
+                <td>Model-independent</td>
+            </tr>
+            <tr>
+                <td><strong>Entropy</strong></td>
+                <td>Token-based</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Lower is better</td>
+                <td>Prediction uncertainty</td>
+            </tr>
+            <tr>
+                <td><strong>Tokens/Char</strong></td>
+                <td>Tokenizer stat</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Lower is better</td>
+                <td>Efficiency measure</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="container">
+        <h2>Results</h2>
+        
+        <h3>Summary Statistics by Language (Main Model)</h3>
+        <p class="small-note">
+            All metrics computed on the same FLORES-200 dev sentences. <strong>Lower is better</strong> for all metrics.
+        </p>
+        {{METRICS_TABLE}}
+        
+        <h3>Means and 95% Bootstrap Confidence Intervals</h3>
+        <p class="ci-note">Bootstrap CIs computed with 1000 resamples. Overlapping intervals suggest no significant difference.</p>
+        {{CI_TABLE}}
+    </div>
+
+    <div class="container">
+        <h2>Visualizations</h2>
+
+        <div class="plot-container">
+            <h3>Bits-per-character by language</h3>
+            <p class="small-note">
+                Tokenizer-agnostic metric for fair cross-lingual comparison.
+            </p>
+            <div>{{PLOT_BPC}}</div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Tokenizer bias: tokens per character</h3>
+            <p class="small-note">
+                Reveals tokenization efficiency differences across languages.
+            </p>
+            <div>{{PLOT_TOKENIZER}}</div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Perplexity vs. bits-per-character</h3>
+            <p class="small-note">
+                Deviations from trend reveal tokenizer effects on perplexity.
+            </p>
+            <div>{{PLOT_PPL_BPC}}</div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Normalized metrics heatmap</h3>
+            <p class="small-note">
+                Metrics normalized to [0, 1] per column. Darker = worse.
+            </p>
+            <div>{{PLOT_HEATMAP}}</div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Loss distribution by language</h3>
+            <p class="small-note">
+                Per-sentence loss variance reveals consistency of model performance.
+            </p>
+            <div>{{PLOT_LOSS_DIST}}</div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Top-50 token frequencies by language</h3>
+            <div>{{PLOT_TOKEN_FREQ}}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Baseline Comparisons</h2>
+        <p class="small-note">
+            Comparison with simple baselines (char-unigram, char-5gram, GPT-2) provides context for main model performance.
+        </p>
+        {{BASELINE_TABLE}}
+    </div>
+
+    <div class="container">
+        <h2>Interpretation</h2>
+        
+        <h3>Cross-Lingual Patterns</h3>
+        {{INTERPRETATION}}
+        
+        <h3>Tokenizer Effects</h3>
+        <p>
+            Morphologically complex languages (Finnish, Turkish) show higher tokens/char ratios, 
+            inflating token-based metrics. BPC corrects for this, revealing true model understanding.
+        </p>
+    </div>
+
+    <div class="container">
+        <h2>Rankings</h2>
+        <p class="small-note">
+            Ranks: 1 = best (lowest value). Aggregate rank = mean of individual metric ranks.
+        </p>
+        {{RANKINGS_TABLE}}
+        
+        <p class="small-note" style="margin-top: 15px;">
+            <strong>Note:</strong> Aggregate rankings can mask typological differences. 
+            Always examine individual metrics and confidence intervals. See Appendix B for detailed interpretation guidance.
+        </p>
+    </div>
+
+    <div class="container limitations">
+        <h2>Known Limitations</h2>
+        <ul>
+            <li>Only the dev split of FLORES-200 is used; genre and domain biases may remain.</li>
+            <li>mode=quick (50 sentences) yields higher variance; prefer mode=full (200 sentences) for final claims.</li>
+            <li>Gzip ratio is an approximation of Shannon entropy and sensitive to encoding and tokenization of punctuation and whitespace.</li>
+            <li>BPC relies on accurate conversion of model loss nats→bits and assumes per-token loss reported by HF is in nats.</li>
+            <li>Perplexity is tokenizer-dependent; cross-model comparisons must be interpreted with caution.</li>
+            <li>GPU memory limits may force smaller batch sizes, slightly affecting timing but not metric correctness.</li>
+            <li>Baselines do not replace comprehensive benchmarking; they contextualize results but are not exhaustive.</li>
+        </ul>
+    </div>
+
+    <!-- APPENDICES -->
+    <div class="container appendix">
+        <h2>Appendix A: Metric Definitions & Calculations</h2>
+        
+        <h3>Formulas</h3>
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 0.9em;">
+            <p><strong>Perplexity:</strong> PPL = exp(loss_nats)</p>
+            <p><strong>BPC:</strong> BPC = (loss_nats / ln(2)) × (num_tokens / num_chars)</p>
+            <p><strong>Entropy:</strong> H = -Σ p(x) log₂(p(x)) for each token distribution</p>
+            <p><strong>Gzip Ratio:</strong> ratio = len(gzip.compress(text.encode('utf-8'))) / len(text.encode('utf-8'))</p>
+            <p><strong>Bootstrap 95% CI:</strong> 1000 resamples with percentile method</p>
+        </div>
+        
+        <h3>Detailed Explanations</h3>
+        <p>
+            <strong>Perplexity</strong> measures model surprise. Mathematically, it's exp(cross-entropy loss). 
+            Lower perplexity = better prediction. Token-based, so affected by tokenization.
+        </p>
+        <p>
+            <strong>Bits-per-character (BPC)</strong> normalizes by characters instead of tokens, removing tokenizer bias. 
+            Crucial for comparing morphologically-rich languages with isolating languages.
+        </p>
+        <p>
+            <strong>Gzip compression ratio</strong> is model-independent, measuring text redundancy. 
+            Lower ratio = more compressible/predictable text.
+        </p>
+        <p>
+            <strong>Entropy</strong> quantifies uncertainty in the model's probability distribution. 
+            High entropy = uncertain (flat distribution), low entropy = confident (peaked distribution).
+        </p>
+    </div>
+
+    <div class="container appendix">
+        <h2>Appendix B: Ranking Interpretation Guide</h2>
+        
+        <h3>Aggregation Method</h3>
+        <p>Aggregate rank = mean of ranks across PPL, BPC, Entropy, and Gzip. Lower = better (rank 1 is best).</p>
+        
+        <h3>Important Caveats</h3>
+        <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; margin: 15px 0; border-radius: 5px;">
+            <p><strong>Warning:</strong> Aggregate rankings can mask typological differences.</p>
+            <ul>
+                <li><strong>Tokenization Bias:</strong> Morphologically complex languages have higher tokens/char, inflating PPL even with comparable understanding.</li>
+                <li><strong>Metric Independence:</strong> A language may rank poorly overall but excel on BPC.</li>
+                <li><strong>Statistical Uncertainty:</strong> Check CIs - overlapping intervals suggest no meaningful difference.</li>
+            </ul>
+        </div>
+        
+        <h3>Recommendations</h3>
+        <ol>
+            <li>Examine individual metrics, not just aggregates</li>
+            <li>Compare tokenizer-agnostic (BPC) vs token-based (PPL) separately</li>
+            <li>Review confidence intervals for statistical significance</li>
+            <li>Consider linguistic typology when interpreting differences</li>
+        </ol>
+    </div>
+
+    <div class="container appendix">
+        <h2>Appendix C: Linguistic Families & Morphology</h2>
+        
+        <h3>Language Family Types</h3>
+        <ul>
+            <li><strong>Agglutinative</strong> (Turkish, Finnish, Swahili): Build words by concatenating morphemes. Long words → more tokens → higher PPL.</li>
+            <li><strong>Fusional</strong> (French, Hindi, Norwegian): Use inflection to express grammar. Words change form (conjugations).</li>
+            <li><strong>Isolating</strong> (Mandarin): Minimal morphology. Monosyllabic words, grammar through word order.</li>
+        </ul>
+        
+        <h3>Impact on Evaluation</h3>
+        <p>
+            <strong>Tokenization challenges:</strong> Agglutinative languages produce more tokens per word.
+            <strong>Vocabulary coverage:</strong> Morphologically-rich languages have many word forms.
+            <strong>Cross-lingual fairness:</strong> Token-based metrics penalize morphologically-rich languages unfairly.
+        </p>
+        
+        <p><strong>Example:</strong> If Finnish requires 2× more tokens than English for the same text, 
+        its perplexity will be artificially higher even if the model understands both equally. BPC corrects for this.</p>
+    </div>
+
+    <div class="container appendix">
+        <h2>Appendix D: Baseline Models</h2>
+        <ul>
+            <li><strong>Char-Unigram:</strong> Predicts each character independently by frequency. Simplest model (epsilon smoothing = 1e-12).</li>
+            <li><strong>Char-5gram:</strong> Predicts each character from previous 4 characters. Captures local patterns (Laplace smoothing α=1).</li>
+            <li><strong>GPT-2:</strong> Neural baseline (124M parameters). Trained primarily on English. Useful for comparison but may show tokenization issues on non-Latin scripts.</li>
+        </ul>
+    </div>
+
+    <div class="container appendix">
+        <h2>Appendix E: Tokenization Analysis</h2>
+        <p class="small-note">
+            Example sentences showing tokenizer segmentation. <strong>Note:</strong> Segmentation shown using both main model and GPT-2 tokenizers for comparison.
+        </p>
+        {{SEGMENTATION_EXAMPLES}}
+    </div>
+</body>
+</html>

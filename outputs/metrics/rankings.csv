@@ -1,0 +1,4 @@
+language,rank_ppl,rank_bpc,rank_entropy,rank_gzip,aggregate_rank
+fra,1,1,1,1,1.00
+zho_Hans,2,3,2,3,2.50
+fin,3,2,3,2,2.50

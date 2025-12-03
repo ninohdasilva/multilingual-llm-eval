@@ -1,0 +1,1 @@
+"""Educational HTML report generation"""
