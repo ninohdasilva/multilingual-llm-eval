@@ -1,4 +1,8 @@
 language,rank_ppl,rank_bpc,rank_entropy,rank_gzip,aggregate_rank
-fra,1,1,1,1,1.00
-zho_Hans,2,3,2,3,2.50
-fin,3,2,3,2,2.50
+hin,1,3,1,1,1.50
+fra,2,1,2,3,2.00
+fin,4,4,3,4,3.75
+tur,5,2,5,6,4.50
+zho_Hans,3,7,4,7,5.25
+swh,6,6,7,2,5.25
+nno,7,5,6,5,5.75

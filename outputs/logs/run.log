@@ -247,3 +247,217 @@ Report generation complete!
 2025-12-03 01:03:01,202 - evaluation - INFO - HTML report saved to outputs/report/report_final.html
 2025-12-03 01:03:01,202 - evaluation - INFO - 
 Report generation complete!
+2025-12-03 01:15:15,218 - evaluation - INFO - ============================================================
+2025-12-03 01:15:15,218 - evaluation - INFO - Multilingual LLM Evaluation Pipeline
+2025-12-03 01:15:15,218 - evaluation - INFO - ============================================================
+2025-12-03 01:15:15,218 - evaluation - INFO - REPORT-ONLY MODE: Regenerating reports from existing metrics
+2025-12-03 01:15:15,218 - evaluation - INFO - Model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:15:15,218 - evaluation - INFO - Languages: fra, fin, zho_Hans
+2025-12-03 01:15:15,218 - evaluation - INFO - Mode: quick
+2025-12-03 01:15:15,879 - evaluation - INFO - Plots generated in outputs/plots
+2025-12-03 01:15:16,005 - evaluation - INFO - HTML report saved to outputs/report/report_final.html
+2025-12-03 01:15:16,005 - evaluation - INFO - 
+Report generation complete!
+2025-12-03 01:17:58,380 - evaluation - INFO - ============================================================
+2025-12-03 01:17:58,380 - evaluation - INFO - Multilingual LLM Evaluation Pipeline
+2025-12-03 01:17:58,380 - evaluation - INFO - ============================================================
+2025-12-03 01:17:58,380 - evaluation - INFO - Model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:17:58,380 - evaluation - INFO - Languages: fra,tur,fin,zho_Hans,swh,hin,nno
+2025-12-03 01:17:58,380 - evaluation - INFO - Mode: full
+2025-12-03 01:17:58,380 - evaluation - INFO - Device: mps
+2025-12-03 01:17:58,380 - evaluation - INFO - Random seed: 42
+2025-12-03 01:17:58,395 - evaluation - INFO - Git commit: 46315cc7e1966b1993dca03f0d11c711fea2d5ae
+2025-12-03 01:17:58,396 - evaluation - INFO - 
+============================================================
+2025-12-03 01:17:58,396 - evaluation - INFO - Evaluating language: fra
+2025-12-03 01:17:58,396 - evaluation - INFO - ============================================================
+2025-12-03 01:17:59,987 - evaluation - INFO - Loaded 200 sentences
+2025-12-03 01:17:59,988 - evaluation - INFO - Loading main model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:18:07,563 - evaluation - INFO - Model loaded on mps
+2025-12-03 01:18:42,745 - evaluation - INFO - Saved segmentation examples for Qwen/Qwen2.5-1.5B
+2025-12-03 01:18:42,745 - evaluation - INFO - Evaluating unigram baseline...
+2025-12-03 01:18:42,768 - evaluation - INFO - Evaluating char-5gram baseline...
+2025-12-03 01:18:42,805 - evaluation - INFO - Evaluating GPT-2 baseline...
+2025-12-03 01:18:53,239 - evaluation - INFO - Saved segmentation examples for GPT-2
+2025-12-03 01:18:53,239 - evaluation - INFO - 
+============================================================
+2025-12-03 01:18:53,239 - evaluation - INFO - Evaluating language: tur
+2025-12-03 01:18:53,239 - evaluation - INFO - ============================================================
+2025-12-03 01:18:54,379 - evaluation - INFO - Loaded 200 sentences
+2025-12-03 01:18:54,380 - evaluation - INFO - Loading main model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:19:14,258 - evaluation - INFO - Model loaded on mps
+2025-12-03 01:19:45,914 - evaluation - INFO - Saved segmentation examples for Qwen/Qwen2.5-1.5B
+2025-12-03 01:19:45,914 - evaluation - INFO - Evaluating unigram baseline...
+2025-12-03 01:19:45,928 - evaluation - INFO - Evaluating char-5gram baseline...
+2025-12-03 01:19:45,955 - evaluation - INFO - Evaluating GPT-2 baseline...
+2025-12-03 01:19:55,199 - evaluation - INFO - Saved segmentation examples for GPT-2
+2025-12-03 01:19:55,199 - evaluation - INFO - 
+============================================================
+2025-12-03 01:19:55,199 - evaluation - INFO - Evaluating language: fin
+2025-12-03 01:19:55,199 - evaluation - INFO - ============================================================
+2025-12-03 01:19:56,687 - evaluation - INFO - Loaded 200 sentences
+2025-12-03 01:19:56,687 - evaluation - INFO - Loading main model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:20:06,114 - evaluation - INFO - Model loaded on mps
+2025-12-03 01:20:41,164 - evaluation - INFO - Saved segmentation examples for Qwen/Qwen2.5-1.5B
+2025-12-03 01:20:41,164 - evaluation - INFO - Evaluating unigram baseline...
+2025-12-03 01:20:41,179 - evaluation - INFO - Evaluating char-5gram baseline...
+2025-12-03 01:20:41,207 - evaluation - INFO - Evaluating GPT-2 baseline...
+2025-12-03 01:20:49,432 - evaluation - INFO - Saved segmentation examples for GPT-2
+2025-12-03 01:20:49,432 - evaluation - INFO - 
+============================================================
+2025-12-03 01:20:49,432 - evaluation - INFO - Evaluating language: zho_Hans
+2025-12-03 01:20:49,432 - evaluation - INFO - ============================================================
+2025-12-03 01:20:51,090 - evaluation - INFO - Loaded 200 sentences
+2025-12-03 01:20:51,090 - evaluation - INFO - Loading main model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:21:00,970 - evaluation - INFO - Model loaded on mps
+2025-12-03 01:21:32,002 - evaluation - INFO - Saved segmentation examples for Qwen/Qwen2.5-1.5B
+2025-12-03 01:21:32,002 - evaluation - INFO - Evaluating unigram baseline...
+2025-12-03 01:21:32,013 - evaluation - INFO - Evaluating char-5gram baseline...
+2025-12-03 01:21:32,028 - evaluation - INFO - Evaluating GPT-2 baseline...
+2025-12-03 01:21:45,040 - evaluation - INFO - Saved segmentation examples for GPT-2
+2025-12-03 01:21:45,041 - evaluation - INFO - 
+============================================================
+2025-12-03 01:21:45,041 - evaluation - INFO - Evaluating language: swh
+2025-12-03 01:21:45,041 - evaluation - INFO - ============================================================
+2025-12-03 01:21:46,215 - evaluation - INFO - Loaded 200 sentences
+2025-12-03 01:21:46,215 - evaluation - INFO - Loading main model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:22:10,522 - evaluation - INFO - Model loaded on mps
+2025-12-03 01:22:48,733 - evaluation - INFO - Saved segmentation examples for Qwen/Qwen2.5-1.5B
+2025-12-03 01:22:48,733 - evaluation - INFO - Evaluating unigram baseline...
+2025-12-03 01:22:48,749 - evaluation - INFO - Evaluating char-5gram baseline...
+2025-12-03 01:22:48,776 - evaluation - INFO - Evaluating GPT-2 baseline...
+2025-12-03 01:22:58,469 - evaluation - INFO - Saved segmentation examples for GPT-2
+2025-12-03 01:22:58,469 - evaluation - INFO - 
+============================================================
+2025-12-03 01:22:58,469 - evaluation - INFO - Evaluating language: hin
+2025-12-03 01:22:58,469 - evaluation - INFO - ============================================================
+2025-12-03 01:22:59,637 - evaluation - INFO - Loaded 200 sentences
+2025-12-03 01:22:59,637 - evaluation - INFO - Loading main model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:23:26,968 - evaluation - INFO - Model loaded on mps
+2025-12-03 01:24:44,656 - evaluation - INFO - Saved segmentation examples for Qwen/Qwen2.5-1.5B
+2025-12-03 01:24:44,657 - evaluation - INFO - Evaluating unigram baseline...
+2025-12-03 01:24:44,678 - evaluation - INFO - Evaluating char-5gram baseline...
+2025-12-03 01:24:44,712 - evaluation - INFO - Evaluating GPT-2 baseline...
+2025-12-03 01:25:13,727 - evaluation - INFO - Saved segmentation examples for GPT-2
+2025-12-03 01:25:13,727 - evaluation - INFO - 
+============================================================
+2025-12-03 01:25:13,727 - evaluation - INFO - Evaluating language: nno
+2025-12-03 01:25:13,727 - evaluation - INFO - ============================================================
+2025-12-03 01:25:15,139 - evaluation - INFO - Loaded 200 sentences
+2025-12-03 01:25:15,139 - evaluation - INFO - Loading main model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:25:49,830 - evaluation - INFO - Model loaded on mps
+2025-12-03 01:26:22,283 - evaluation - INFO - Saved segmentation examples for Qwen/Qwen2.5-1.5B
+2025-12-03 01:26:22,283 - evaluation - INFO - Evaluating unigram baseline...
+2025-12-03 01:26:22,297 - evaluation - INFO - Evaluating char-5gram baseline...
+2025-12-03 01:26:22,328 - evaluation - INFO - Evaluating GPT-2 baseline...
+2025-12-03 01:26:32,080 - evaluation - INFO - Saved segmentation examples for GPT-2
+2025-12-03 01:26:32,080 - evaluation - INFO - 
+Saving metrics to outputs/metrics/metrics_full.csv
+2025-12-03 01:26:32,083 - evaluation - INFO - Metrics saved to outputs/metrics/metrics_full.csv
+2025-12-03 01:26:32,083 - evaluation - INFO - 
+============================================================
+2025-12-03 01:26:32,083 - evaluation - INFO - RUNNING VALIDATION TESTS
+2025-12-03 01:26:32,084 - evaluation - INFO - ============================================================
+2025-12-03 01:26:32,084 - evaluation - INFO - 
+[TEST 1] PPL Sanity Check
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on fra - PPL=18.65
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: unigram-char on fra - PPL=23.28
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: char-5gram on fra - PPL=26.44
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: gpt2 on fra - PPL=131.22
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on tur - PPL=59.68
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: unigram-char on tur - PPL=26.87
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: char-5gram on tur - PPL=28.94
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: gpt2 on tur - PPL=306.22
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on fin - PPL=57.37
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: unigram-char on fin - PPL=21.57
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: char-5gram on fin - PPL=25.73
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: gpt2 on fin - PPL=615.67
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on zho_Hans - PPL=53.48
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: unigram-char on zho_Hans - PPL=518.40
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: char-5gram on zho_Hans - PPL=655.24
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: gpt2 on zho_Hans - PPL=35.80
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on swh - PPL=158.07
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: unigram-char on swh - PPL=21.11
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: char-5gram on swh - PPL=21.16
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: gpt2 on swh - PPL=549.63
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on hin - PPL=4.71
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: unigram-char on hin - PPL=30.90
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: char-5gram on hin - PPL=38.08
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: gpt2 on hin - PPL=6.43
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on nno - PPL=250.13
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: unigram-char on nno - PPL=22.63
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: char-5gram on nno - PPL=28.18
+2025-12-03 01:26:32,084 - evaluation - INFO -   PASS: gpt2 on nno - PPL=578.24
+2025-12-03 01:26:32,084 - evaluation - INFO - 
+[TEST 2] Gzip Identity Check
+2025-12-03 01:26:32,086 - evaluation - ERROR -   FAIL: fra has different gzip ratios across models: {np.float64(0.940295), 0.8907}
+2025-12-03 01:26:32,086 - evaluation - ERROR -   FAIL: tur has different gzip ratios across models: {0.9615, np.float64(1.013476)}
+2025-12-03 01:26:32,086 - evaluation - ERROR -   FAIL: fin has different gzip ratios across models: {np.float64(0.953123), 0.901314}
+2025-12-03 01:26:32,086 - evaluation - ERROR -   FAIL: zho_Hans has different gzip ratios across models: {np.float64(1.164298), 1.111623}
+2025-12-03 01:26:32,087 - evaluation - ERROR -   FAIL: swh has different gzip ratios across models: {np.float64(0.939818), 0.886164}
+2025-12-03 01:26:32,087 - evaluation - ERROR -   FAIL: hin has different gzip ratios across models: {np.float64(0.595546), 0.560912}
+2025-12-03 01:26:32,087 - evaluation - ERROR -   FAIL: nno has different gzip ratios across models: {np.float64(0.988133), 0.93428}
+2025-12-03 01:26:32,087 - evaluation - INFO - 
+[TEST 3] Segmentation Files Check
+2025-12-03 01:26:32,089 - evaluation - WARNING -   WARN: Possible UTF-8 artifacts in outputs/report/segmentation_examples_fra.jsonl
+2025-12-03 01:26:32,090 - evaluation - WARNING -   WARN: Possible UTF-8 artifacts in outputs/report/segmentation_examples_tur.jsonl
+2025-12-03 01:26:32,090 - evaluation - WARNING -   WARN: Possible UTF-8 artifacts in outputs/report/segmentation_examples_fin.jsonl
+2025-12-03 01:26:32,091 - evaluation - INFO -   PASS: outputs/report/segmentation_examples_zho_Hans.jsonl exists and clean
+2025-12-03 01:26:32,091 - evaluation - INFO -   PASS: outputs/report/segmentation_examples_swh.jsonl exists and clean
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: outputs/report/segmentation_examples_hin.jsonl exists and clean
+2025-12-03 01:26:32,092 - evaluation - WARNING -   WARN: Possible UTF-8 artifacts in outputs/report/segmentation_examples_nno.jsonl
+2025-12-03 01:26:32,092 - evaluation - INFO - 
+[TEST 4] Token Round-trip Results
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on fra - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: unigram-char on fra - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: char-5gram on fra - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: gpt2 on fra - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on tur - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: unigram-char on tur - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: char-5gram on tur - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: gpt2 on tur - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on fin - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: unigram-char on fin - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: char-5gram on fin - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: gpt2 on fin - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on zho_Hans - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: unigram-char on zho_Hans - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: char-5gram on zho_Hans - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: gpt2 on zho_Hans - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on swh - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: unigram-char on swh - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: char-5gram on swh - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: gpt2 on swh - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on hin - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: unigram-char on hin - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: char-5gram on hin - tokenization valid
+2025-12-03 01:26:32,092 - evaluation - INFO -   PASS: gpt2 on hin - tokenization valid
+2025-12-03 01:26:32,093 - evaluation - INFO -   PASS: Qwen/Qwen2.5-1.5B on nno - tokenization valid
+2025-12-03 01:26:32,093 - evaluation - INFO -   PASS: unigram-char on nno - tokenization valid
+2025-12-03 01:26:32,093 - evaluation - INFO -   PASS: char-5gram on nno - tokenization valid
+2025-12-03 01:26:32,093 - evaluation - INFO -   PASS: gpt2 on nno - tokenization valid
+2025-12-03 01:26:32,093 - evaluation - INFO - 
+============================================================
+2025-12-03 01:26:32,093 - evaluation - INFO - VALIDATION FAILED (with warnings)
+2025-12-03 01:26:32,093 - evaluation - INFO - ============================================================
+
+2025-12-03 01:26:32,093 - evaluation - WARNING - Some validation tests failed. Check logs for details.
+2025-12-03 01:26:32,101 - evaluation - INFO - Rankings saved to outputs/metrics/rankings.csv
+2025-12-03 01:26:33,481 - evaluation - INFO - Plots generated in outputs/plots
+2025-12-03 01:26:33,599 - evaluation - INFO - Loss distribution plot saved to outputs/plots/loss_distribution.png
+2025-12-03 01:26:33,600 - evaluation - INFO - Report summary saved to outputs/logs/REPORT_SUMMARY.txt
+2025-12-03 01:26:33,768 - evaluation - INFO - HTML report saved to outputs/report/report_final.html
+2025-12-03 01:26:33,768 - evaluation - INFO - 
+Evaluation complete! Duration: 515.23 seconds
+2025-12-03 01:27:25,161 - evaluation - INFO - ============================================================
+2025-12-03 01:27:25,161 - evaluation - INFO - Multilingual LLM Evaluation Pipeline
+2025-12-03 01:27:25,161 - evaluation - INFO - ============================================================
+2025-12-03 01:27:25,161 - evaluation - INFO - REPORT-ONLY MODE: Regenerating reports from existing metrics
+2025-12-03 01:27:25,161 - evaluation - INFO - Model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:27:25,161 - evaluation - INFO - Languages: fra, tur, fin, zho_Hans, swh, hin, nno
+2025-12-03 01:27:25,162 - evaluation - INFO - Mode: full
+2025-12-03 01:27:25,896 - evaluation - INFO - Plots generated in outputs/plots
+2025-12-03 01:27:25,896 - evaluation - INFO - Using runtime from last run: 515.23 seconds
+2025-12-03 01:27:26,067 - evaluation - INFO - HTML report saved to outputs/report/report_final.html
+2025-12-03 01:27:26,067 - evaluation - INFO - 
+Report generation complete!

@@ -1,6 +1,10 @@
 # Multilingual LLM Evaluation Pipeline
 
-A reproducible evaluation framework for assessing multilingual language models across diverse language families using FLORES-200 dataset. This project implements comprehensive metrics (perplexity, BPC, compression, entropy) with 4 baseline models and generates visualizations with bootstrap confidence intervals.
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/ninohdasilva/multilingual-llm-eval)
+
+**Repository**: [https://github.com/ninohdasilva/multilingual-llm-eval](https://github.com/ninohdasilva/multilingual-llm-eval)
+
+A reproducible evaluation framework for assessing multilingual language models across diverse language families using FLORES-200 dataset. This project implements comprehensive metrics (perplexity, BPC, compression, entropy) with 3 baseline models and generates interactive visualizations with bootstrap confidence intervals.
 
 ## 🎯 Project Overview
 
@@ -18,7 +22,7 @@ This pipeline evaluates language models on multiple languages from different mor
 - ✅ **Bootstrap Confidence Intervals**: 95% CI with 1000 resamples for all main metrics
 - ✅ **7 Languages**: French, Turkish, Finnish, Mandarin, Swahili, Hindi, Norwegian Nynorsk
 - ✅ **Visualizations**: PNG plots with 95% CI error bars (300 DPI)
-- ✅ **Educational HTML/PDF Report**: Comprehensive explanations with Known Limitations section
+- ✅ **Interactive HTML Report**: Comprehensive report with Plotly visualizations and Known Limitations section
 - ✅ **OOM Handling**: Automatic batch size reduction on out-of-memory errors
 - ✅ **Comprehensive Logging**: Detailed logs with timestamps, errors, and git commit SHA
 - ✅ **Reproducible**: Fixed random seed (42) for all operations
@@ -27,7 +31,6 @@ This pipeline evaluates language models on multiple languages from different mor
 
 - Python 3.11+
 - [uv](https://github.com/astral-sh/uv) package manager
-- Optional: wkhtmltopdf or Chrome for PDF generation
 
 ## 🚀 Installation
 
@@ -48,7 +51,7 @@ This pipeline evaluates language models on multiple languages from different mor
 Run a quick test with 3 languages and 50 sentences per language:
 
 ```bash
-uv run python src/main.py --model HuggingFaceTB/SmolLM3-3B --langs fra,fin,zho_Hans --mode quick --device cuda
+uv run python src/main.py --model Qwen/Qwen2.5-1.5B --langs fra,fin,zho_Hans --mode quick --device cuda
 ```
 
 ### Full Evaluation
@@ -56,7 +59,7 @@ uv run python src/main.py --model HuggingFaceTB/SmolLM3-3B --langs fra,fin,zho_H
 Run full evaluation with 3 languages and 200 sentences per language:
 
 ```bash
-uv run python src/main.py --model HuggingFaceTB/SmolLM3-3B --langs fra,fin,zho_Hans --mode full --device cuda
+uv run python src/main.py --model Qwen/Qwen2.5-1.5B --langs fra,fin,zho_Hans --mode full --device cuda
 ```
 
 ### Using the Evaluation Script
@@ -74,7 +77,7 @@ This runs:
 ### CLI Options
 
 **Required Arguments (unless using --report-only):**
-- `--model MODEL_NAME`: HuggingFace model identifier (e.g., HuggingFaceTB/SmolLM3-3B)
+- `--model MODEL_NAME`: HuggingFace model identifier (e.g., Qwen/Qwen2.5-1.5B)
 - `--langs LANG1,LANG2,...`: Comma-separated FLORES language codes (e.g., fra,fin,zho_Hans)
 
 **Optional Arguments:**
@@ -94,7 +97,7 @@ uv run python src/main.py --report-only
 This will:
 - Read existing `outputs/metrics/metrics_full.csv`
 - Regenerate all plots (if missing or outdated)
-- Regenerate HTML and PDF reports
+- Regenerate HTML report
 - Skip all model evaluation (much faster)
 
 **Note:** Model and language information will be inferred from the CSV if not provided.
@@ -193,21 +196,17 @@ Report files:
    - Calculation formulas
    - Metrics table and visualizations
    - Per-language segmentation examples (2 sentences × models)
-   - Rankings with interpretation addendum
+   - Rankings with interpretation guide
    - Comprehensive definitions section
    - Known limitations
 
-2. **`report_final.pdf`**: PDF version of the HTML report (requires wkhtmltopdf or Chrome)
-
-3. **`segmentation_examples_LANG.jsonl`**: Tokenization examples showing how each tokenizer segments text (2 sentences per language × models). Each line is a JSON object with:
+2. **`segmentation_examples_LANG.jsonl`**: Tokenization examples showing how each tokenizer segments text (2 sentences per language × models). Each line is a JSON object with:
    - `language`: Language code
    - `model`: Model identifier
    - `original`: Original sentence
    - `tokens`: Pipe-separated tokens
    - `token_ids`: Comma-separated token IDs
    - `num_tokens`, `num_chars`, `tokens_per_char`: Statistics
-
-4. **`addendum_text.txt`**: Key points for ranking interpretation (useful for interviews/presentations)
 
 ### `outputs/logs/`
 
@@ -230,10 +229,6 @@ Comprehensive educational HTML report with:
 - **Per-Language Segmentation Analysis**: Tokenization examples
 - **Rankings Table**: Comparative rankings with aggregate rank
 - **Known Limitations**: Verbatim limitations section as specified
-
-### `outputs/report/report_final.pdf`
-
-PDF version of the report (generated if wkhtmltopdf or Chrome is available)
 
 ### `outputs/logs/run.log`
 
@@ -404,8 +399,7 @@ multilingual-llm-eval/
 │   │   └── templates/
 │   │       └── report_template.html # HTML report template
 │   └── report/
-│       ├── report_generator.py  # HTML report generation (legacy)
-│       └── generate_report.py  # HTML and PDF report generation
+│       └── generate_report.py  # HTML report generation
 ├── outputs/
 │   ├── logs/
 │   │   ├── run.log            # Comprehensive execution log
@@ -416,8 +410,7 @@ multilingual-llm-eval/
 │   │   └── rankings.csv       # Rankings table
 │   ├── plots/                 # PNG visualizations (300 DPI)
 │   └── report/
-│       ├── report_final.html  # HTML report
-│       └── report_final.pdf   # PDF report (if available)
+│       └── report_final.html  # HTML report
 ├── pyproject.toml             # Project configuration
 ├── requirements.txt           # Pip requirements
 ├── run.sh                     # Example execution script
@@ -484,12 +477,6 @@ The first run will download FLORES-200 (~500MB). Ensure you have:
 - Sufficient disk space
 - Write permissions
 
-### PDF Generation
-
-If PDF generation fails:
-- Install `wkhtmltopdf`: `brew install wkhtmltopdf` (macOS) or `apt-get install wkhtmltopdf` (Linux)
-- Or ensure Chrome/Chromium is available in PATH
-- The HTML report will still be generated
 
 ## 📝 License
 
@@ -513,3 +500,7 @@ This project is provided as-is for educational purposes.
 **Happy Evaluating!** 🚀
 
 For questions or issues, please refer to the comprehensive HTML report generated in `outputs/report/report_final.html`.
+
+---
+
+**Repository**: [https://github.com/ninohdasilva/multilingual-llm-eval](https://github.com/ninohdasilva/multilingual-llm-eval)

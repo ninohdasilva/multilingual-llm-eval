@@ -69,7 +69,7 @@ def save_segmentation_examples_jsonl(
 
     Args:
         language_code: FLORES language code (e.g., 'fra', 'zho_Hans')
-        model_name: Model identifier (e.g., 'gpt2', 'HuggingFaceTB/SmolLM3-3B')
+        model_name: Model identifier (e.g., 'gpt2', 'Qwen/Qwen2.5-1.5B')
         sentences: List of sentences to tokenize
         tokenizer: Tokenizer to use
         output_dir: Directory to save JSONL file

@@ -20,7 +20,7 @@ def parse_args() -> argparse.Namespace:
         "--model",
         type=str,
         required=False,
-        help="HuggingFace model identifier (e.g., HuggingFaceTB/SmolLM3-3B). Required unless --report-only is used.",
+        help="HuggingFace model identifier (e.g., Qwen/Qwen2.5-1.5B). Required unless --report-only is used.",
     )
 
     parser.add_argument(

@@ -1,4 +1,4 @@
-# Modified: 2025-12-02 - Added segmentation table, addendum, and Plotly plots
+# Modified: 2025-12-02 - Added segmentation table and Plotly plots
 """Generate HTML reports from metrics."""
 
 import csv
@@ -18,6 +18,8 @@ def generate_html_report(
     model_name: str,
     mode: str,
     languages: list,
+    git_commit: str = None,
+    runtime: float = 0.0,
 ) -> Path:
     """
     Generate HTML report from metrics.
@@ -29,6 +31,8 @@ def generate_html_report(
         model_name: Model name
         mode: Evaluation mode (quick/full)
         languages: List of language codes
+        git_commit: Git commit SHA (optional)
+        runtime: Runtime in seconds (optional)
 
     Returns:
         Path to generated HTML file
@@ -180,9 +184,6 @@ def generate_html_report(
     # Generate segmentation table from JSONL files
     seg_examples = generate_segmentation_table(output_dir, languages)
 
-    # Generate addendum text file
-    generate_addendum_text(output_dir)
-
     # Replace placeholders
     html = html.replace("{{MODEL_NAME}}", model_name)
     html = html.replace("{{RUN_DATE}}", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -214,6 +215,12 @@ def generate_html_report(
     html = html.replace("{{PLOT_HEATMAP}}", plot_heatmap)
     html = html.replace("{{PLOT_LOSS_DIST}}", plot_loss_dist)
     html = html.replace("{{PLOT_TOKEN_FREQ}}", plot_token_freq)
+
+    # Replace footer placeholders
+    html = html.replace("{{GIT_COMMIT}}", git_commit or "N/A")
+    html = html.replace(
+        "{{RUNTIME}}", f"{runtime:.2f} seconds" if runtime > 0 else "N/A"
+    )
 
     # Write HTML
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -289,29 +296,3 @@ def generate_segmentation_table(output_dir: Path, languages: list[str]) -> str:
         table_html = "<p><em>No segmentation examples available. Run evaluation with segmentation enabled.</em></p>"
 
     return table_html
-
-
-def generate_addendum_text(output_dir: Path) -> None:
-    """
-    Generate addendum text file for interview use.
-
-    Args:
-        output_dir: Output directory
-    """
-    addendum_path = output_dir / "report" / "addendum_text.txt"
-
-    content = """Ranking Interpretation - Key Points for Interview:
-
-1. The aggregate ranking averages four metrics (PPL, BPC, Entropy, Gzip). While useful for overview, it can mask important typological differences between languages.
-
-2. Morphologically complex languages (e.g., Finnish, Turkish) often show higher tokens-per-character ratios, which can inflate token-based metrics like perplexity even when the model has comparable understanding.
-
-3. Always examine individual metrics and confidence intervals before drawing conclusions. A language ranking poorly on aggregate may excel on specific tokenizer-agnostic metrics like BPC.
-"""
-
-    try:
-        with open(addendum_path, "w", encoding="utf-8") as f:
-            f.write(content)
-        logger.info(f"Addendum text saved to {addendum_path}")
-    except Exception as e:
-        logger.error(f"Failed to write addendum text: {e}")

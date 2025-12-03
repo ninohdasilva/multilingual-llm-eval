@@ -505,6 +505,30 @@ def main():
         except Exception as e:
             logger.warning(f"Failed to generate plots: {e}")
 
+        # Read runtime from last run if available
+        runtime = 0.0
+        summary_path = output_dir / "logs" / "REPORT_SUMMARY.txt"
+        if summary_path.exists():
+            try:
+                with open(summary_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.startswith("Duration (wall clock):"):
+                            # Extract duration value: "Duration (wall clock): 515.23 seconds"
+                            parts = line.split(":", 1)
+                            if len(parts) == 2:
+                                duration_str = (
+                                    parts[1].strip().replace(" seconds", "").strip()
+                                )
+                                runtime = float(duration_str)
+                                logger.info(
+                                    f"Using runtime from last run: {runtime:.2f} seconds"
+                                )
+                            break
+            except (ValueError, IndexError) as e:
+                logger.warning(f"Could not parse runtime from REPORT_SUMMARY.txt: {e}")
+        else:
+            logger.info("REPORT_SUMMARY.txt not found, using runtime: 0.0 seconds")
+
         # Generate HTML report
         try:
             from report.generate_report import generate_html_report
@@ -516,6 +540,8 @@ def main():
                 model_name,
                 mode,
                 language_codes,
+                get_git_commit(),
+                runtime,
             )
             logger.info(f"HTML report saved to {html_path}")
         except Exception as e:
@@ -807,6 +833,8 @@ def main():
                 args.model,
                 args.mode,
                 language_codes,
+                git_commit,
+                duration,
             )
             logger.info(f"HTML report saved to {html_path}")
         except Exception as e:
