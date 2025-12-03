@@ -461,3 +461,15 @@ Evaluation complete! Duration: 515.23 seconds
 2025-12-03 01:27:26,067 - evaluation - INFO - HTML report saved to outputs/report/report_final.html
 2025-12-03 01:27:26,067 - evaluation - INFO - 
 Report generation complete!
+2025-12-03 01:30:37,015 - evaluation - INFO - ============================================================
+2025-12-03 01:30:37,015 - evaluation - INFO - Multilingual LLM Evaluation Pipeline
+2025-12-03 01:30:37,015 - evaluation - INFO - ============================================================
+2025-12-03 01:30:37,015 - evaluation - INFO - REPORT-ONLY MODE: Regenerating reports from existing metrics
+2025-12-03 01:30:37,015 - evaluation - INFO - Model: Qwen/Qwen2.5-1.5B
+2025-12-03 01:30:37,015 - evaluation - INFO - Languages: fra, tur, fin, zho_Hans, swh, hin, nno
+2025-12-03 01:30:37,015 - evaluation - INFO - Mode: full
+2025-12-03 01:30:37,694 - evaluation - INFO - Plots generated in outputs/plots
+2025-12-03 01:30:37,694 - evaluation - INFO - Using runtime from last run: 515.23 seconds
+2025-12-03 01:30:37,815 - evaluation - INFO - HTML report saved to outputs/report/report_final.html
+2025-12-03 01:30:37,815 - evaluation - INFO - 
+Report generation complete!
